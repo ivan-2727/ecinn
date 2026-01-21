@@ -2,3 +2,4 @@ __pychache__
 images1
 images/*
 fit.avi
+*.pyc
