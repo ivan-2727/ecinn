@@ -1,5 +1,5 @@
 from network import make_network
-from read import read_experiments
+from myio import read_experiments
 from data_generator import DataGenerator
 import tensorflow as tf
 from model import ECINN 
@@ -27,13 +27,13 @@ def frozen(i):
     return i%tot_var == 2
 
 weights_list = [tf.Variable(0.0 if frozen(i) else 1.0, trainable=(not frozen(i))) for i in range(tot_var*len(networks))]
-print(len(weights_list))
+
 ecinn = ECINN(
     networks=networks, 
     generator=generator, 
     weights_list=weights_list, 
     outerBoundary="SI",
-    saved=None)
+    saved='model.weights.h5')
 
 tf.keras.utils.plot_model(ecinn.model, to_file='ECINN_model.png', rankdir="LR",show_shapes=True,expand_nested=True,dpi=200) #Requires installation of Graphviz and pydot
 
@@ -43,7 +43,7 @@ derived_params=derived_params,
 num_test_samples=num_test_samples, weights = [weights_list[i] for i in range(len(weights_list)) if frozen(i)])
 
 ecinn.fit(
-    epochs=100, verbose=2, 
+    epochs=300, verbose=2, 
     callbacks=[
         tf.keras.callbacks.LearningRateScheduler(schedule, verbose=0),
         adaptive_weights

@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from draw import draw_comparison
 from tensorflow.keras.callbacks import LambdaCallback
+from myio import write_lambdas
 
 class AdaptiveWeights(tf.keras.callbacks.LambdaCallback):
     def __init__(self, ecinn, experiments, derived_params, num_test_samples, weights):
@@ -21,7 +22,8 @@ class AdaptiveWeights(tf.keras.callbacks.LambdaCallback):
             sigmas = [e.sigma for e in self.experiments]
         )
         draw_comparison(epoch, predictions, self.experiments)
-        if epoch > 50:
+        write_lambdas(self.ecinn.get_lambdas())
+        if epoch > 20:
             for w in self.weights:
                 if w < 1:
                     w.assign_add(5e-2)

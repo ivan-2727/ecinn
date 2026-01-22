@@ -117,19 +117,5 @@ class DataGenerator(tf.keras.utils.Sequence):
                 interpolated_flux[i],
                 C_bnd1[i]
             ])
-         
-        # for i, xi in enumerate(x_train):
-        #     xi = np.asarray(xi)
-        #     print(
-        #         f"Input {i}: shape={xi.shape}, "
-        #         f"std={xi.std():.3e}, min={xi.min():.3e}, max={xi.max():.3e}"
-        #     )
-        # for i, yi in enumerate(y_train):
-        #     yi = np.asarray(yi)
-        #     print(
-        #         f"Output {i}: shape={yi.shape}, "
-        #         f"std={yi.std():.3e}, min={yi.min():.3e}, max={yi.max():.3e}"
-        #     )
-        # input()
 
         return tuple(x_train), tuple(y_train)

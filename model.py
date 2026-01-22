@@ -71,16 +71,11 @@ class ECINN:
             flux, eqn = self.DLayer(du_dx_bnd0[i], du_dt[i], d2u_dx2[i])
             diffusion_flux.append(flux)
             u_eqn.append(eqn)
-            pf = tf.keras.layers.Dense(1, activation=None, use_bias=False,
-                                       kernel_initializer='ones', trainable=False,
-                                       name=f'predicted_flux_{i+1}')( -flux )
-            predicted_flux.append(pf)
+            predicted_flux.append(-flux)
 
         BV_flux = [self.BVLayer(theta_aux[i], u_bnd0[i]) for i in range(num_networks)]
         u_BV_bnd0 = [
-            tf.keras.layers.Dense(1, activation=None, use_bias=False, kernel_initializer='ones',
-                                  trainable=False, name=f'BV_bnd0_{i+1}')(diffusion_flux[i] - BV_flux[i])
-            for i in range(num_networks)
+            (diffusion_flux[i] - BV_flux[i]) for i in range(num_networks)
         ]
 
         if outerBoundary == 'SI':
@@ -108,7 +103,7 @@ class ECINN:
         if saved:
             self.model.load_weights(saved)
         optimizer = tf.keras.optimizers.Adam(
-            learning_rate=1e-3,
+            learning_rate=4e-4,
         )
         self.model.compile(optimizer=optimizer, loss=tuple('mse' for _ in range(len(weights_list))), loss_weights=weights_list)         
 

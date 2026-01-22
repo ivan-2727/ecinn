@@ -7,16 +7,6 @@ class GradientLayer(tf.keras.layers.Layer):
         super().__init__(**kwargs)
 
     def call(self, x):
-        # with tf.GradientTape(persistent=True) as tape2:
-        #     tape2.watch(x)
-        #     with tf.GradientTape() as tape1:
-        #         tape1.watch(x)
-        #         u = self.model(x)
-        #     du_dtx = tape1.gradient(u, x)
-        #     du_dt = du_dtx[:, 0:1]
-        #     du_dx = du_dtx[:, 1:2]
-        # d2u_dx2 = tape2.gradient(du_dx, x)[:, 1:2]
-        # return u, du_dt, du_dx, d2u_dx2
 
         with tf.GradientTape() as g:
             g.watch(x)
@@ -35,8 +25,21 @@ class BVLayerCathodic(tf.keras.layers.Layer):
     """
     def __init__(self,name='FluxLayer'):
         super().__init__(name=name)
-        self.lambda_K0 = tf.Variable(initial_value=1.0,trainable=True,name='lambda_K0',constraint=tf.keras.constraints.non_neg())
-        self.lambda_alpha = tf.Variable(initial_value=0.4,trainable=True,name='lambda_alpha',constraint=tf.keras.constraints.non_neg())
+        self.lambda_K0 = self.add_weight(
+            name='lambda_K0',
+            shape=(),
+            initializer=tf.keras.initializers.Constant(1.0),
+            trainable=True,
+            constraint=tf.keras.constraints.NonNeg()
+        )
+
+        self.lambda_alpha = self.add_weight(
+            name='lambda_alpha',
+            shape=(),
+            initializer=tf.keras.initializers.Constant(0.4),
+            trainable=True,
+            constraint=tf.keras.constraints.NonNeg()
+        )
 
     def call(self,theta_aux,u_bnd0):
         return self.lambda_K0*tf.exp(-self.lambda_alpha*theta_aux)*u_bnd0
@@ -45,7 +48,13 @@ class DiffusionCoefficientLayer(tf.keras.layers.Layer):
     
     def __init__(self):
         super().__init__()
-        self.lambda_dA = tf.Variable(initial_value=0.4,trainable=True,name ='lambda_d_A',constraint=tf.keras.constraints.non_neg())
+        self.lambda_dA = self.add_weight(
+            name='lambda_dA',
+            shape=(),
+            initializer=tf.keras.initializers.Constant(0.4),
+            trainable=True,
+            constraint=tf.keras.constraints.NonNeg()
+        )
 
     def call(self,du_dx_bnd0,du_dt,d2u_dx2):
         flux = self.lambda_dA * du_dx_bnd0

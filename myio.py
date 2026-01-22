@@ -48,3 +48,11 @@ def read_experiments(path, name, scan_rates):
             pot_flux = pot_flux.rename({"Potential(V)":"Potential","Current(I)":"Flux"},axis=1)
         ))
     return params, derived_params, experiments 
+
+def write_lambdas(lambdas):
+    f = open('lambdas.txt', 'a')
+    s = ""
+    for v in lambdas:
+        s += f"{"{:.6f}".format(v)}\t"
+    f.write(s+"\n")
+    f.close()
